@@ -1,4 +1,4 @@
-onnx_path: ""
+onnx_path: "deploy_halfsquat.onnx"
 motion_length: 140 
 
 tau_limit: [88.0,  88.0, 88.0,

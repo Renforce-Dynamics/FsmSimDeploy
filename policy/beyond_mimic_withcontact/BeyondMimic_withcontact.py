@@ -17,7 +17,7 @@ class BeyondMimic_Contact(FSMState):
         self.state_cmd = state_cmd
         self.policy_output = policy_output
         self.name = FSMStateName.SKILL_BEYOND_MIMIC
-        self.name_str = "beyond_mimic"
+        self.name_str = "beyond_mimic_withcontact"
         self.motion_phase = 0
         self.counter_step = 0
         self.ref_motion_phase = 0

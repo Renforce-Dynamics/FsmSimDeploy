@@ -64,6 +64,7 @@ Navigate to the directory and install:
 cd RoboMimic_Deploy
 pip install numpy==1.20.0
 pip install onnx onnxruntime
+pip install pygame mujoco
 ```
 
 #### 2.2.3 Install unitree_sdk2_python
