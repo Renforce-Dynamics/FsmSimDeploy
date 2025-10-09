@@ -83,3 +83,5 @@ Desktop.ini
 *.log
 *.sqlite
 *.db
+
+**/policy/beyond_mimic_withcontact/model/
