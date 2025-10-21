@@ -40,7 +40,7 @@ class FSM:
         self.kick_policy = Kick(state_cmd, policy_output)
         self.kungfu2_policy = KungFu2(state_cmd, policy_output)
         self.beyond_mimic_policy = BeyondMimic(state_cmd, policy_output)
-        self.beyond_mimic_withcontact_policy = BeyondMimic_Contact(state_cmd, policy_output)
+        # self.beyond_mimic_withcontact_policy = BeyondMimic_Contact(state_cmd, policy_output)
         
         print("initalized all policies!!!")
         

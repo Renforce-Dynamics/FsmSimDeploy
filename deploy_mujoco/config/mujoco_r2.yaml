@@ -1,0 +1,3 @@
+xml_path: "r2_wholebody/r2_wb.xml"
+simulation_dt: 0.005
+control_decimation: 4
