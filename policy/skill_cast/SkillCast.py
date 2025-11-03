@@ -39,6 +39,7 @@ class SkillCast(FSMState):
             self.upper_target_angles_skill_1 = np.array(config["upper_target_angles_skill_1"], dtype=np.float32)
             self.upper_target_angles_skill_2 = np.array(config["upper_target_angles_skill_2"], dtype=np.float32)
             self.upper_target_angles_skill_4 = np.array(config["upper_target_angles_skill_4"], dtype=np.float32)
+            self.upper_target_angles_skill_5 = np.array(config["upper_target_angles_skill_5"], dtype=np.float32)
             
             self.qj_obs = np.zeros(self.num_actions, dtype=np.float32)
             self.dqj_obs = np.zeros(self.num_actions, dtype=np.float32)
@@ -104,6 +105,8 @@ class SkillCast(FSMState):
             self.upper_dof_target = self.upper_target_angles_skill_2
         elif(self.state_cmd.skill_cmd == FSMCommand.SKILL_4):
             self.upper_dof_target = self.upper_target_angles_skill_4
+        elif(self.state_cmd.skill_cmd == FSMCommand.SKILL_5):
+            self.upper_dof_target = self.upper_target_angles_skill_5
         else:
             self.upper_dof_target = self.default_angles[self.upper_body_motor_idx]
         
@@ -127,6 +130,9 @@ class SkillCast(FSMState):
             self.state_cmd.skill_cmd = FSMCommand.INVALID
             return FSMStateName.SKILL_KungFu
         elif(self.cur_step >= self.num_step and self.state_cmd.skill_cmd == FSMCommand.SKILL_4):
+            self.state_cmd.skill_cmd = FSMCommand.INVALID
+            return FSMStateName.SKILL_KungFu2
+        elif(self.cur_step >= self.num_step and self.state_cmd.skill_cmd == FSMCommand.SKILL_5):
             self.state_cmd.skill_cmd = FSMCommand.INVALID
             return FSMStateName.SKILL_KungFu2
         elif(self.state_cmd.skill_cmd == FSMCommand.PASSIVE):

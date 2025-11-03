@@ -85,3 +85,4 @@ Desktop.ini
 *.db
 
 **/policy/beyond_mimic_withcontact/model/
+*.onnx
