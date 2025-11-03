@@ -1,5 +1,7 @@
+# TODO : update config according to new model
 onnx_path: "policy_model/deploy_halfsquat_saferl_seed42.onnx"
 motion_length: 140 # 469, 1160, 2440
+mode: "saferl"
 
 tau_limit: [88.0,  88.0, 88.0,
                    88.0,  88.0, 88.0,
