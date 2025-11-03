@@ -9,7 +9,7 @@ import onnx
 import onnxruntime
 import torch
 import os
-
+from typing import Literal
 
 class BeyondMimic_Contact(FSMState):
     def __init__(self, state_cmd:StateAndCmd, policy_output:PolicyOutput):
@@ -36,6 +36,7 @@ class BeyondMimic_Contact(FSMState):
             self.num_obs = config["num_obs"]
             self.action_scale_lab = np.array(config["action_scale_lab"], dtype=np.float32)
             self.motion_length = config["motion_length"]
+            self.mode: Literal["baseline", "saferl"] = config["mode"]
             
             self.qj_obs = np.zeros(self.num_actions, dtype=np.float32)
             self.dqj_obs = np.zeros(self.num_actions, dtype=np.float32)
@@ -60,7 +61,10 @@ class BeyondMimic_Contact(FSMState):
                 self.input_name.append(inpt.name)
                 
             self.onnx_metadata = {prop.key: prop.value for prop in self.onnx_model.metadata_props}
-            self.time_step_total = int(self.onnx_metadata["time_step_total"])
+            if "time_step_total" in self.onnx_metadata:
+                self.time_step_total = int(self.onnx_metadata["time_step_total"])
+            else:
+                self.time_step_total = self.motion_length
 
             print("BeyondMimic-like policy initializing ...")
     
