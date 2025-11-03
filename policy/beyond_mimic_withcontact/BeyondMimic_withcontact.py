@@ -58,6 +58,9 @@ class BeyondMimic_Contact(FSMState):
             self.input_name = []
             for i, inpt in enumerate(input):
                 self.input_name.append(inpt.name)
+                
+            self.onnx_metadata = {prop.key: prop.value for prop in self.onnx_model.metadata_props}
+            self.time_step_total = int(self.onnx_metadata["time_step_total"])
 
             print("BeyondMimic-like policy initializing ...")
     
@@ -222,12 +225,15 @@ class BeyondMimic_Contact(FSMState):
         
         # update motion phase
         self.counter_step += 1
+        
+        if self.counter_step >= self.time_step_total - 1:
+            self.state_cmd.skill_cmd = FSMCommand.LOCO
 
     def exit(self):
         self.action = np.zeros(23, dtype=np.float32)
-        self.action_buf = np.zeros(23 * self.history_length, dtype=np.float32)
+        # self.action_buf = np.zeros(23 * self.history_length, dtype=np.float32)
         self.ref_motion_phase = 0.
-        self.ref_motion_phase_buf = np.zeros(1 * self.history_length, dtype=np.float32)
+        # self.ref_motion_phase_buf = np.zeros(1 * self.history_length, dtype=np.float32)
         self.motion_time = 0
         self.counter_step = 0
         

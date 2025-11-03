@@ -1,5 +1,5 @@
-onnx_path: "deploy_halfsquat.onnx"
-motion_length: 140 
+onnx_path: "policy_model/deploy_halfsquat_saferl_seed42.onnx"
+motion_length: 140 # 469, 1160, 2440
 
 tau_limit: [88.0,  88.0, 88.0,
                    88.0,  88.0, 88.0,

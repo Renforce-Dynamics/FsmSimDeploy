@@ -90,6 +90,10 @@ if __name__ == "__main__":
                 if joystick.is_button_released(JoystickButton.Y) and joystick.is_button_pressed(JoystickButton.L1):
                     state_cmd.skill_cmd = FSMCommand.SKILL_4
                     print("Skill 4")
+                    
+                if joystick.is_button_released(JoystickButton.B) and joystick.is_button_pressed(JoystickButton.L1):
+                    state_cmd.skill_cmd = FSMCommand.SKILL_5
+                    print("Skill 5")
                 
                 # Velocity command mapping (using axis inputs)
                 # Axis 0: Left stick X-axis (left/right movement)

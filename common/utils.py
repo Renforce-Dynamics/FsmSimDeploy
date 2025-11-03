@@ -16,6 +16,7 @@ class FSMStateName(Enum):
     SKILL_KICK = 8
     SKILL_KungFu2 = 9
     SKILL_BEYOND_MIMIC = 10
+    SKILL_CONTACT_BEYOND_MIMIC = 11
    
 
 @unique
@@ -28,6 +29,7 @@ class FSMCommand(Enum):
     SKILL_2 = 6
     SKILL_3 = 7
     SKILL_4 = 8
+    SKILL_5 = 9
     
     
     

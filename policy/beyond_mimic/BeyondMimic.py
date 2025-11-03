@@ -217,12 +217,15 @@ class BeyondMimic(FSMState):
         
         # update motion phase
         self.counter_step += 1
+        
+        if self.counter_step >= self.motion_length - 1:
+            self.state_cmd.skill_cmd = FSMCommand.LOCO
 
     def exit(self):
         self.action = np.zeros(23, dtype=np.float32)
-        self.action_buf = np.zeros(23 * self.history_length, dtype=np.float32)
+        # self.action_buf = np.zeros(23 * self.history_length, dtype=np.float32)
         self.ref_motion_phase = 0.
-        self.ref_motion_phase_buf = np.zeros(1 * self.history_length, dtype=np.float32)
+        # self.ref_motion_phase_buf = np.zeros(1 * self.history_length, dtype=np.float32)
         self.motion_time = 0
         self.counter_step = 0
         

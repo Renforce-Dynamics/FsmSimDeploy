@@ -100,6 +100,8 @@ class FSM:
         elif((policy_name == FSMStateName.SKILL_KungFu2)):
             self.cur_policy = self.kungfu2_policy
         elif((policy_name == FSMStateName.SKILL_BEYOND_MIMIC)):
+            self.cur_policy = self.beyond_mimic_policy
+        elif((policy_name == FSMStateName.SKILL_CONTACT_BEYOND_MIMIC)):
             self.cur_policy = self.beyond_mimic_withcontact_policy
         else:
             pass
