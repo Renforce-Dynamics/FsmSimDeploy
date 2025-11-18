@@ -42,6 +42,7 @@ class TerminalController:
         print("  B+R1        - Skill 3")
         print("  Y+L1        - Skill 4")
         print("  B+L1        - Skill 5")
+        print("  Z+L1        - Skill 6")
         print("  vel x y z   - Set velocity (e.g., 'vel 0.5 0 0.2')")
         print("  exit        - Exit program")
         print("===========================\n")
@@ -96,85 +97,89 @@ if __name__ == "__main__":
     Running = True
     
     print("MuJoCo simulation started with terminal control!")
-    
-    with mujoco.viewer.launch_passive(m, d) as viewer:
+        
+    with mujoco.viewer.launch_passive(m, d,show_right_ui=False) as viewer:
+
         sim_start_time = time.time()
         while viewer.is_running() and Running:
-            try:
-                # Process terminal commands
-                cmd = controller.get_command()
-                if cmd:
-                    if cmd == "exit":
-                        print("Exit signal detected, shutting down...")
-                        Running = False
-                    elif cmd == "l3":
-                        state_cmd.skill_cmd = FSMCommand.PASSIVE
-                        print("Switched to passive mode")
-                    elif cmd == "start":
-                        state_cmd.skill_cmd = FSMCommand.POS_RESET
-                        print("Position reset")
-                    elif cmd == "a+r1":
-                        state_cmd.skill_cmd = FSMCommand.LOCO
-                        print("Motion mode")
-                    elif cmd == "x+r1":
-                        state_cmd.skill_cmd = FSMCommand.SKILL_1
-                        print("Skill 1")
-                    elif cmd == "y+r1":
-                        state_cmd.skill_cmd = FSMCommand.SKILL_2
-                        print("Skill 2")
-                    elif cmd == "b+r1":
-                        state_cmd.skill_cmd = FSMCommand.SKILL_3
-                        print("Skill 3")
-                    elif cmd == "y+l1":
-                        state_cmd.skill_cmd = FSMCommand.SKILL_4
-                        print("Skill 4")
-                    elif cmd == "b+l1":
-                        state_cmd.skill_cmd = FSMCommand.SKILL_5
-                        print("Skill 5")
-                    elif cmd.startswith("vel "):
-                        try:
-                            parts = cmd.split()
-                            if len(parts) == 4:
-                                state_cmd.vel_cmd[0] = float(parts[1])  # x
-                                state_cmd.vel_cmd[1] = float(parts[2])  # y
-                                state_cmd.vel_cmd[2] = float(parts[3])  # z
-                                print(f"Velocity set to: {state_cmd.vel_cmd}")
-                        except ValueError:
-                            print("Invalid velocity format. Use: vel x y z")
-                    else:
-                        print(f"Unknown command: {cmd}")
+            # try:
+            # Process terminal commands
+            cmd = controller.get_command()
+            if cmd:
+                if cmd == "exit":
+                    print("Exit signal detected, shutting down...")
+                    Running = False
+                elif cmd == "l3":
+                    state_cmd.skill_cmd = FSMCommand.PASSIVE
+                    print("Switched to passive mode")
+                elif cmd == "start":
+                    state_cmd.skill_cmd = FSMCommand.POS_RESET
+                    print("Position reset")
+                elif cmd == "a+r1":
+                    state_cmd.skill_cmd = FSMCommand.LOCO
+                    print("Motion mode")
+                elif cmd == "x+r1":
+                    state_cmd.skill_cmd = FSMCommand.SKILL_1
+                    print("Skill 1")
+                elif cmd == "y+r1":
+                    state_cmd.skill_cmd = FSMCommand.SKILL_2
+                    print("Skill 2")
+                elif cmd == "b+r1":
+                    state_cmd.skill_cmd = FSMCommand.SKILL_3
+                    print("Skill 3")
+                elif cmd == "y+l1":
+                    state_cmd.skill_cmd = FSMCommand.SKILL_4
+                    print("Skill 4")
+                elif cmd == "b+l1":
+                    state_cmd.skill_cmd = FSMCommand.SKILL_5
+                    print("Skill 5")
+                elif cmd == "z+l1":
+                    state_cmd.skill_cmd = FSMCommand.SKILL_6
+                    print("Skill 6")
+                elif cmd.startswith("vel "):
+                    try:
+                        parts = cmd.split()
+                        if len(parts) == 4:
+                            state_cmd.vel_cmd[0] = float(parts[1])  # x
+                            state_cmd.vel_cmd[1] = float(parts[2])  # y
+                            state_cmd.vel_cmd[2] = float(parts[3])  # z
+                            print(f"Velocity set to: {state_cmd.vel_cmd}")
+                    except ValueError:
+                        print("Invalid velocity format. Use: vel x y z")
+                else:
+                    print(f"Unknown command: {cmd}")
+            
+            step_start = time.time()
+            
+            tau = pd_control(policy_output_action, d.qpos[7:], kps, np.zeros_like(kps), d.qvel[6:], kds)
+            d.ctrl[:] = tau
+            mujoco.mj_step(m, d)
+            sim_counter += 1
+            if sim_counter % control_decimation == 0:
                 
-                step_start = time.time()
+                qj = d.qpos[7:]
+                dqj = d.qvel[6:]
+                quat = d.qpos[3:7]
                 
-                tau = pd_control(policy_output_action, d.qpos[7:], kps, np.zeros_like(kps), d.qvel[6:], kds)
-                d.ctrl[:] = tau
-                mujoco.mj_step(m, d)
-                sim_counter += 1
-                if sim_counter % control_decimation == 0:
+                omega = d.qvel[3:6] 
+                gravity_orientation = get_gravity_orientation(quat)
+                
+                state_cmd.q = qj.copy()
+                state_cmd.dq = dqj.copy()
+                state_cmd.gravity_ori = gravity_orientation.copy()
+                state_cmd.base_quat = quat.copy()
+                state_cmd.ang_vel = omega.copy()
+                
+                FSM_controller.run()
+                policy_output_action = policy_output.actions.copy()
+                kps = policy_output.kps.copy()
+                kds = policy_output.kds.copy()
                     
-                    qj = d.qpos[7:]
-                    dqj = d.qvel[6:]
-                    quat = d.qpos[3:7]
-                    
-                    omega = d.qvel[3:6] 
-                    gravity_orientation = get_gravity_orientation(quat)
-                    
-                    state_cmd.q = qj.copy()
-                    state_cmd.dq = dqj.copy()
-                    state_cmd.gravity_ori = gravity_orientation.copy()
-                    state_cmd.base_quat = quat.copy()
-                    state_cmd.ang_vel = omega.copy()
-                    
-                    FSM_controller.run()
-                    policy_output_action = policy_output.actions.copy()
-                    kps = policy_output.kps.copy()
-                    kds = policy_output.kds.copy()
-                    
-            except ValueError as e:
-                print(f"Error: {str(e)}")
-            except Exception as e:
-                print(f"Unexpected error: {str(e)}")
-                break
+            # except ValueError as e:
+            #     print(f"Error: {str(e)}")
+            # except Exception as e:
+            #     print(f"Unexpected error: {str(e)}")
+            #     break
             
             viewer.sync()
             time_until_next_step = m.opt.timestep - (time.time() - step_start)
